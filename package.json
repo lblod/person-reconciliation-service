@@ -1,7 +1,7 @@
 {
-  "name": "person-reconsilation-service",
+  "name": "person-reconcilation-service",
   "version": "0.1.0",
-  "description": "Microservice reconsiliating duplicate person data based on a unique person identifier.",
+  "description": "Microservice reconciliating duplicate person data based on a unique person identifier.",
   "dependencies": {
     "@lblod/mu-auth-sudo": "^0.2.0"
   },
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lblod/person-reconsiliation-service.git"
+    "url": "git+https://github.com/lblod/person-reconciliation-service.git"
   },
   "author": "redpencil.io",
   "license": "MIT"

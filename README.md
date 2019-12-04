@@ -1,6 +1,6 @@
-# person-reconsiliation-service
+# person-reconciliation-service
 
-Microservice reconsiliating duplicate person data based on a unique person identifier.
+Microservice reconciliating duplicate person data based on a unique person identifier.
 
 The service ensures there is a unique person, identifier and birthdate related to one RRN
 across graphs. In the end each graph contains a copy of the 'master' record. The master record
@@ -19,25 +19,25 @@ Add the following snippet in your `docker-compose.yml`:
 ```
 version: '3.4'
 services:
-    person-reconsiliation:
-        image: lblod/person-reconsiliation-service
+    person-reconciliation:
+        image: lblod/person-reconciliation-service
         links:
           - database:database
 ```
 
 ## API
 
-### POST /reconsiliate
+### POST /reconciliate
 
-Reconsiliate all duplicate RRNs in the database.
+Reconciliate all duplicate RRNs in the database.
 
 Optional query params:
 * `dry-run` [boolean]: whether to run the execution in test mode, only calculating the master record, but not executing INSERT/DELETE queries
 
 
-### POST /reconsiliate/:rrn
+### POST /reconciliate/:rrn
 
-Reconsiliate the duplicates of a given RRN in the database.
+Reconciliate the duplicates of a given RRN in the database.
 
 Optional query params:
 * `dry-run` [boolean]: whether to run the execution in test mode, only calculating the master record, but not executing INSERT/DELETE queries

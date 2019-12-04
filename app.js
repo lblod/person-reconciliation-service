@@ -1,5 +1,5 @@
 import { app, errorHandler } from 'mu';
-import { getDuplicateIdentificators, reconsiliatePerson } from './support';
+import { getDuplicateIdentificators, reconciliatePerson } from './support';
 
 app.get('/report', async function(req, res, next) {
   try {
@@ -12,24 +12,24 @@ app.get('/report', async function(req, res, next) {
   }
 });
 
-app.post('/reconsiliate', async function(req, res, next) {
+app.post('/reconciliate', async function(req, res, next) {
   const isDryRun = req.query['dry-run'];
 
   try {
     const rrns = await getDuplicateIdentificators();
     console.log(`Found ${rrns.length} duplicate RRNs`);
 
-    async function reconsiliateBulk(rrns) {
+    async function reconciliateBulk(rrns) {
       const total = rrns.length;
       let i = 1;
       for (let rrn of rrns) {
-        console.log(`Reconsiliating ${i}/${total}`);
-        await reconsiliatePerson(rrn, { isDryRun });
+        console.log(`Reconciliating ${i}/${total}`);
+        await reconciliatePerson(rrn, { isDryRun });
         i++;
       }
     }
 
-    reconsiliateBulk(rrns); // don't await, but execute in background
+    reconciliateBulk(rrns); // don't await, but execute in background
 
     res.status(202).end();
   }
@@ -39,11 +39,11 @@ app.post('/reconsiliate', async function(req, res, next) {
   }
 });
 
-app.post('/reconsiliate/:rrn', async function(req, res, next) {
+app.post('/reconciliate/:rrn', async function(req, res, next) {
   const rrn = req.params.rrn;
   const isDryRun = req.query['dry-run'];
   try {
-    await reconsiliatePerson(rrn, { isDryRun });
+    await reconciliatePerson(rrn, { isDryRun });
     res.status(204).end();
   }
   catch(e) {

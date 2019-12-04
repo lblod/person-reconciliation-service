@@ -2,7 +2,7 @@ import { querySudo as query, updateSudo as update } from '@lblod/mu-auth-sudo';
 import { sparqlEscapeString, sparqlEscapeUri } from 'mu';
 
 /**
- * Reconsiliates duplicates of a person by making sure there is a unique person,
+ * Reconciliates duplicates of a person by making sure there is a unique person,
  * identifier and birthdate related to one RRN.
  *
  * First, all duplicates - based on the RRN - of a person, identifier and birthdate
@@ -18,12 +18,12 @@ import { sparqlEscapeString, sparqlEscapeUri } from 'mu';
  * kept using owl:sameAs.
  *
  * @public
- * @param rrn {string} RRN to reconsiliate the duplicates for
+ * @param rrn {string} RRN to reconciliate the duplicates for
  * @param options {Object} Options for execution
  * @param options.isDryRun {boolean} Whether to run the execution in test mode,
  *          only calculating the master record, but not execution INSERT/DELETE queries
 */
-async function reconsiliatePerson(rrn, options = {}) {
+async function reconciliatePerson(rrn, options = {}) {
   const persons = await getDuplicatePersonUris(rrn);
 
   if (persons.length > 1) {
@@ -499,6 +499,6 @@ async function insertSameAs(masterUri, slaveUri, graph) {
 }
 
 export {
-  reconsiliatePerson,
+  reconciliatePerson,
   getDuplicateIdentificators
 }
