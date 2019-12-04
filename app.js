@@ -1,6 +1,17 @@
 import { app, errorHandler } from 'mu';
 import { getDuplicateIdentificators, reconsiliatePerson } from './support';
 
+app.get('/report', async function(req, res, next) {
+  try {
+    const rrns = await getDuplicateIdentificators();
+    res.status(200).send({ duplicates: rrns.length });
+  }
+  catch(e) {
+    console.error(e);
+    next(new Error(e.message));
+  }
+});
+
 app.post('/reconsiliate', async function(req, res, next) {
   const isDryRun = req.query['dry-run'];
 
