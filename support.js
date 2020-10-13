@@ -336,23 +336,24 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX persoon: <http://data.vlaanderen.be/ns/persoon#>
 
 DELETE {
-  ${sparqlEscapeUri(uri)} a person:Person ;
-      mu:uuid ?uuid ;
-      adms:identifier ?identifier ;
-      foaf:familyName ?familyName ;
-      foaf:name ?name ;
-      persoon:gebruikteVoornaam ?firstName ;
-      persoon:heeftGeboorte ?birthdate ;
-      persoon:geslacht ?gender .
+  GRAPH ${sparqlEscapeUri(graph)} {
+    ${sparqlEscapeUri(uri)} a person:Person ;
+        mu:uuid ?uuid ;
+        adms:identifier ?identifier ;
+        foaf:familyName ?familyName ;
+        foaf:name ?name ;
+        persoon:gebruikteVoornaam ?firstName ;
+        persoon:heeftGeboorte ?birthdate ;
+        persoon:geslacht ?gender .
 
-  ?birthdate a persoon:Geboorte ;
-      mu:uuid ?geboorteUuid ;
-      persoon:datum ?date .
+    ?birthdate a persoon:Geboorte ;
+        mu:uuid ?geboorteUuid ;
+        persoon:datum ?date .
 
-  ?identifier a adms:Identifier ;
-      mu:uuid ?identifierUuid ;
-      skos:notation ?notation .
-
+    ?identifier a adms:Identifier ;
+        mu:uuid ?identifierUuid ;
+        skos:notation ?notation .
+  }
 } WHERE {
   GRAPH ${sparqlEscapeUri(graph)} {
     ${sparqlEscapeUri(uri)} a person:Person ;
