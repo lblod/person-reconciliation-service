@@ -1,5 +1,9 @@
 import { app, errorHandler } from 'mu';
-import { getDuplicateIdentificators, reconciliatePerson } from './support';
+import { getDuplicateIdentificators, reconciliatePerson, getRrn } from './support';
+import bodyParser from 'body-parser';
+import flatten from 'lodash.flatten';
+
+app.use(bodyParser.json({ type: function(req) { return /^application\/json/.test(req.get('content-type')); } }));
 
 app.get('/report', async function(req, res, next) {
   try {
@@ -51,5 +55,45 @@ app.post('/reconciliate/:rrn', async function(req, res, next) {
     next(new Error(e.message));
   }
 });
+
+app.post('/delta', async function(req, res, next) {
+  const identificators = getIdentificators(req.body);
+  if (!identificators.length) {
+    console.log("Deltas do not contain an identificator. Nothing should happen.");
+    return res.status(204).send();
+  }
+
+  for (let identificator of identificators) {
+    try {
+      const rrn = await getRrn(identificator);
+      await reconciliatePerson(rrn);
+    } catch (e) {
+      console.log(`Something went wrong while handling deltas for identificator ${identificator}`);
+      console.log(e);
+      return next(e);
+    }
+  }
+
+  return res.status(202).send();
+});
+
+/**
+ * Returns the identificator URIs found in the deltas.
+ *
+ * @param Object delta Message as received from the delta notifier
+*/
+function getIdentificators(delta) {
+  const inserts = flatten(delta.map(changeSet => changeSet.inserts));
+  return inserts.filter(isIdentificatorTriple).map(t => t.object.value);
+}
+
+/**
+ * Returns whether the passed triple is an addition of identificator to a person or not.
+ *
+ * @param Object triple Triple as received from the delta notifier
+*/
+function isIdentificatorTriple(triple) {
+  return triple.predicate.value == 'http://www.w3.org/ns/adms#identifier';
+};
 
 app.use(errorHandler);

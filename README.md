@@ -27,6 +27,12 @@ services:
 
 ## API
 
+### POST /delta
+
+Reconciliate the duplicates of a RRN brought by the deltas.
+
+The service is triggered by the insertion of a triple having for preficate `http://www.w3.org/ns/adms#identifier`.
+
 ### POST /reconciliate
 
 Reconciliate all duplicate RRNs in the database.

@@ -499,7 +499,32 @@ async function insertSameAs(masterUri, slaveUri, graph) {
   `);
 }
 
+
+/**
+ * Get the rrn associated to an identificator.
+ *
+ * @private
+ * @return {String} Rrn
+*/
+async function getRrn(identificatorUri) {
+  const result = await query(`
+    PREFIX person: <http://www.w3.org/ns/person#>
+    PREFIX adms: <http://www.w3.org/ns/adms#>
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
+
+    SELECT DISTINCT ?rrn WHERE {
+      GRAPH ?g {
+        ${sparqlEscapeUri(identificatorUri)} skos:notation ?rrn .
+      }
+    }
+  `);
+
+  return result.results.bindings[0]['rrn'].value;
+}
+
 export {
   reconciliatePerson,
-  getDuplicateIdentificators
+  getDuplicateIdentificators,
+  getRrn
 }
