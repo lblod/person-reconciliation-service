@@ -302,17 +302,19 @@ async function replaceSlaveWithMaster(slave, master) {
   await deleteSlaveData(slave.person.uri, graph);
   await insertMasterData(master, graph);
 
-  if (slave.person) {
-    await replaceSlaveUris(master.person.uri, slave.person.uri, graph);
+  // One of the slaves has the same uri as the master person / identifier / birthdate
+  // and doesn't need a replacement
+  if (slave.person && (master.person.uri != slave.person.uri)) {
+    await replaceSlaveUris(master.person.uri, slave.person.uri, graph, { referencedInOtherGraphs: true });
     await insertSameAs(master.person.uri, slave.person.uri, graph);
   }
 
-  if (slave.identifier) {
+  if (slave.identifier && (master.identifier.uri != slave.identifier.uri)) {
     await replaceSlaveUris(master.identifier.uri, slave.identifier.uri, graph);
     await insertSameAs(master.identifier.uri, slave.identifier.uri, graph);
   }
 
-  if (slave.birthdate) {
+  if (slave.birthdate && (master.birthdate.uri != slave.birthdate.uri)) {
     await replaceSlaveUris(master.birthdate.uri, slave.birthdate.uri, graph);
     await insertSameAs(master.birthdate.uri, slave.birthdate.uri, graph);
   }
@@ -438,9 +440,12 @@ PREFIX persoon: <http://data.vlaanderen.be/ns/persoon#>
  * @private
  * @param masterUri {string} URI of the master to insert
  * @param slaveUri {string} URI of the slave to delete
- * @param graph {string} Graph to insert in and delete from
+ * @param graph {string} Graph to insert in and delete from. If none defined, select from all graphs.
+   @param options {Object} Options for queries
+ * @param options.referencedInOtherGraphs {boolean} Whether the slaveUri is expected to be referenced
+ *           in other graphs, for example the public graph.
 */
-async function replaceSlaveUris(masterUri, slaveUri, graph) {
+async function replaceSlaveUris(masterUri, slaveUri, graph, options = {}) {
   await update(`
     DELETE {
       GRAPH ${sparqlEscapeUri(graph)} {
@@ -459,19 +464,19 @@ async function replaceSlaveUris(masterUri, slaveUri, graph) {
     }
   `);
 
-  await update(`
+   await update(`
     DELETE {
-      GRAPH ${sparqlEscapeUri(graph)} {
+      GRAPH ${options.referencedInOtherGraphs ? "?g" : sparqlEscapeUri(graph)} {
         ?s ?p ${sparqlEscapeUri(slaveUri)} .
       }
     }
     INSERT {
-      GRAPH ${sparqlEscapeUri(graph)} {
+      GRAPH ${options.referencedInOtherGraphs ? "?g" : sparqlEscapeUri(graph)} {
         ?s ?p ${sparqlEscapeUri(masterUri)} .
       }
     }
     WHERE {
-      GRAPH ${sparqlEscapeUri(graph)} {
+      GRAPH ${options.referencedInOtherGraphs ? "?g" : sparqlEscapeUri(graph)} {
         ?s ?p ${sparqlEscapeUri(slaveUri)} .
       }
     }
