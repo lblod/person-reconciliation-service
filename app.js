@@ -2,6 +2,14 @@ import { app, errorHandler } from 'mu';
 import { getDuplicateIdentificators, reconciliatePerson, getRrn } from './support';
 import bodyParser from 'body-parser';
 import flatten from 'lodash.flatten';
+import { CronJob } from 'cron';
+import request from 'request';
+
+const cronFrequency = process.env.RECONCILIATION_CRON_PATTERN || '0 0 1 * * *';
+new CronJob(cronFrequency, function() {
+  console.log(`Reconciliation triggered by cron job at ${new Date().toISOString()}`);
+  request.post('http://localhost/reconciliate/');
+}, null, true);
 
 app.use(bodyParser.json({ type: function(req) { return /^application\/json/.test(req.get('content-type')); } }));
 
